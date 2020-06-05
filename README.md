@@ -8,7 +8,7 @@ Create Zip with encryption and extract data from encrypt Zip.
 </ul>
 
 
-![alt text](https://raw.githubusercontent.com/rocketbot-cl/Strings/master/example/zipper.png)
+![alt text](https://raw.githubusercontent.com/rocketbot-cl/zipper/master/example/zipper.png)
 
 <h2>Dependencies</h2>
 
