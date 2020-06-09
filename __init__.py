@@ -53,6 +53,7 @@ if module == "encryptZip":
     }
 
 
+
     try:
         if secret:
             secret = secret.encode()
@@ -68,11 +69,53 @@ if module == "encryptZip":
             zip_path = file_.split(".")
             zip_path[-1] = "zip"
             zip_path = ".".join(zip_path)
+        
+        #https://stackoverflow.com/questions/60087965/how-to-zip-a-folder-in-python-with-password
+        def zip_folderPyzipper(folder_path, output_path, compressionType, password, bits):
+            global pyzipper, os
+            """Zip the contents of an entire folder (with that folder included
+            in the archive). Empty subfolders will be included in the archive
+            as well.
+            """
+            parent_folder = os.path.dirname(folder_path)
+            print(parent_folder)
+            # Retrieve the paths of the folder contents.
+            contents = os.walk(folder_path)
+            try:
+                zip_file = pyzipper.AESZipFile(output_path,'w',compression=compressionType,encryption=pyzipper.WZ_AES)
+                zip_file.pwd=password
+                for root, folders, files in contents:
+                    # Include all subfolders, including empty ones.
+                    for folder_name in folders:
+                        absolute_path = os.path.join(root, folder_name)
+                        relative_path = absolute_path.replace(parent_folder + os.sep,
+                                                            '')
+                        print ("Adding '%s' to archive." % absolute_path, relative_path)
+                        zip_file.write(absolute_path, relative_path)
+                    for file_name in files:
+                        absolute_path = os.path.join(root, file_name)
+                        relative_path = absolute_path.replace(parent_folder + os.sep,
+                                                            '')
+                        print ("Adding '%s' to archive." % absolute_path)
+                        zip_file.write(absolute_path, relative_path)
 
-        with pyzipper.AESZipFile(zip_path, 'w', compression=compression[method]) as zf:
-            zf.setpassword(secret)
-            zf.setencryption(pyzipper.WZ_AES, nbits=bits)
-            zf.write(file_, basename(file_))
+                print ("'%s' created successfully." % output_path)
+                zip_file.close()
+            except Exception as e:
+                print(e)
+                PrintException()
+            
+                
+
+        print("Compress:" , file_, " in", zip_path)
+        if os.path.isdir(file_):
+            zip_folderPyzipper( file_, zip_path,compression[method], secret, bits )
+        else:
+            with pyzipper.AESZipFile(zip_path, 'w', compression=compression[method]) as zf:
+                zf.setpassword(secret)
+                zf.setencryption(pyzipper.WZ_AES, nbits=bits)
+                zf.write(file_, basename(file_))
+
     except Exception as e:
         PrintException()
         raise e
