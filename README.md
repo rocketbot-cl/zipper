@@ -28,3 +28,7 @@ Create Zip with encryption and extract data from encrypt Zip.
 <ul>
   <li><strong><a href="http://opensource.org/licenses/mit-license.php" rel="nofollow">MIT license</a></strong></li>
 </ul>  
+
+## Update
+
+v0.2 Now can compress folders
