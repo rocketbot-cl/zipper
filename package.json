@@ -45,6 +45,10 @@
               "es": "Archivo: ",
               "en": "File: "
             },
+            "description": {
+              "es": "Selecciona el archivo a encriptar",
+              "en": "Select the file to encrypt"
+            },
             "id": "file",
             "css": "col-md-12"
           },
@@ -54,9 +58,13 @@
               "es": "Tipo de compresión: ",
               "en": "Compression type: "
             },
+            "description": {
+              "es": "Selecciona el tipo de compresión",
+              "en": "Select the compression type"
+            },
             "placeholder": {
-              "es": " --- Seleccione opción ---- ",
-              "en": " --- Select option ---- "
+              "es": "DEFLATED",
+              "en": "DEFLATED"
             },
             "options": [
               {
@@ -85,9 +93,13 @@
               "es": "Número de bits: ",
               "en": "Bits: "
             },
+            "description": {
+              "es": "Selecciona el número de bits",
+              "en": "Select the number of bits"
+            },
             "placeholder": {
-              "es": " --- Seleccione opción ---- ",
-              "en": " --- Select option ---- "
+              "es": "256 bits",
+              "en": "256 bits"
             },
             "options": [
               {
@@ -120,6 +132,10 @@
               "es": "Clave: ",
               "en": "Password: "
             },
+            "description": {
+              "es": "Introduce la clave",
+              "en": "Enter the password"
+            },
             "id": "pass",
             "css": "col-md-4"
           },
@@ -132,6 +148,10 @@
             "title": {
               "es": "Path where save zip: ",
               "en": "Ruta donde guardar el zip: "
+            },
+            "description": {
+              "es": "Introduce la ruta donde guardar el zip",
+              "en": "Enter the path where to save the zip"
             },
             "help": {
               "es": "Por defecto, se guardará en la carpeta del archivo",
@@ -181,6 +201,10 @@
               "es": "Archivo: ",
               "en": "File: "
             },
+            "description": {
+              "es": "Archivo zip a desencriptar",
+              "en": "Zip file to decrypt"
+            },
             "id": "zip",
             "css": "col-md-8"
           },
@@ -194,6 +218,10 @@
               "es": "Clave: ",
               "en": "Password: "
             },
+            "description": {
+              "es": "Clave del archivo zip",
+              "en": "Zip file password"
+            },
             "id": "pass",
             "css": "col-md-4"
           },
@@ -206,6 +234,10 @@
             "title": {
               "en": "Path where extract zip: ",
               "es": "Ruta donde extraer el zip: "
+            },
+            "description": {
+              "en": "Path where extract zip",
+              "es": "Ruta donde extraer el zip"
             },
             "help": {
               "es": "Por defect, se guardará en la carpeta del archivo",

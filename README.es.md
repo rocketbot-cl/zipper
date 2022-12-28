@@ -1,23 +1,23 @@
 # Zipper
   
-Module to compress and decompress encrypted files.  
+Módulo para comprimir y descomprimir archivos encriptados.  
 
 *Read this in other languages: [English](README.md), [Spanish](README.es.md),*
 
-## How to install this module
+## Como instalar este módulo
   
-__Download__ and __install__ the content in 'modules' folder in Rocketbot path  
+__Descarga__ e __instala__ el contenido en la carpeta 'modules' en la ruta de Rocketbot.  
 
 
 
 ## Overview
 
 
-1. Encrypt Zip  
-Create an encrypted zip
+1. Encriptar Zip  
+Crea un zip encriptado
 
-2. Decrypt Zip  
-Get files of encrypted zip  
+2. Desencriptar Zip  
+Obtiene archivos de un zip encriptado  
 
 
 
