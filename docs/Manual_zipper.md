@@ -32,3 +32,4 @@ Get files of encrypted zip
 |File |Zip file to decrypt|//Users/User/Path/to/file|
 |Password |Zip file password|s3cre7p4ss|
 |Path where extract zip |Path where extract zip|//Users/User/path/to/folder|
+
