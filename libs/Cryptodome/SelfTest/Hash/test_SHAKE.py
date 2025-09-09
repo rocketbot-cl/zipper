@@ -33,7 +33,7 @@
 import unittest
 from binascii import hexlify, unhexlify
 
-from Cryptodome.SelfTest.loader import load_tests
+from Cryptodome.SelfTest.loader import load_test_vectors
 from Cryptodome.SelfTest.st_common import list_test_cases
 
 from Cryptodome.Hash import SHAKE128, SHAKE256
@@ -69,7 +69,7 @@ class SHAKETest(unittest.TestCase):
         digest = h.read(90)
 
         # read returns a byte string of the right length
-        self.failUnless(isinstance(digest, type(b("digest"))))
+        self.assertTrue(isinstance(digest, type(b("digest"))))
         self.assertEqual(len(digest), 90)
 
     def test_update_after_read(self):
@@ -77,6 +77,14 @@ class SHAKETest(unittest.TestCase):
         mac.update(b("rrrr"))
         mac.read(90)
         self.assertRaises(TypeError, mac.update, b("ttt"))
+
+    def test_copy(self):
+        mac = self.shake.new()
+        mac.update(b("rrrr"))
+        mac2 = mac.copy()
+        x1 = mac.read(90)
+        x2 = mac2.read(90)
+        self.assertEqual(x1, x2)
 
 
 class SHAKE128Test(SHAKETest):
@@ -91,10 +99,10 @@ class SHAKEVectors(unittest.TestCase):
     pass
 
 
-test_vectors_128 = load_tests(("Cryptodome", "SelfTest", "Hash", "test_vectors", "SHA3"),
+test_vectors_128 = load_test_vectors(("Hash", "SHA3"),
                                "ShortMsgKAT_SHAKE128.txt",
                                "Short Messages KAT SHAKE128",
-                               { "len" : lambda x: int(x) } )
+                               { "len" : lambda x: int(x) } ) or []
 
 for idx, tv in enumerate(test_vectors_128):
     if tv.len == 0:
@@ -110,10 +118,10 @@ for idx, tv in enumerate(test_vectors_128):
     setattr(SHAKEVectors, "test_128_%d" % idx, new_test)
 
 
-test_vectors_256 = load_tests(("Cryptodome", "SelfTest", "Hash", "test_vectors", "SHA3"),
+test_vectors_256 = load_test_vectors(("Hash", "SHA3"),
                                "ShortMsgKAT_SHAKE256.txt",
                                "Short Messages KAT SHAKE256",
-                               { "len" : lambda x: int(x) } )
+                               { "len" : lambda x: int(x) } ) or []
 
 for idx, tv in enumerate(test_vectors_256):
     if tv.len == 0:

@@ -20,31 +20,61 @@
 # SOFTWARE.
 # ===================================================================
 
-import unittest
+import os
 import re
+import errno
+import warnings
+import unittest
+from unittest import SkipTest
 
 from Cryptodome.PublicKey import RSA
-from Cryptodome.SelfTest.st_common import *
-from Cryptodome.Util.py3compat import *
+from Cryptodome.SelfTest.st_common import a2b_hex, list_test_cases
+from Cryptodome.IO import PEM
+from Cryptodome.Util.py3compat import b, tostr, FileNotFoundError
 from Cryptodome.Util.number import inverse
 from Cryptodome.Util import asn1
 
-from Cryptodome.Util._file_system import pycryptodome_filename
+try:
+    import pycryptodome_test_vectors  # type: ignore
+    test_vectors_available = True
+except ImportError:
+    test_vectors_available = False
 
 
-def load_file(filename, mode="rb"):
-    comps = [ "Cryptodome", "SelfTest", "PublicKey", "test_vectors", "RSA" ]
-    with open(pycryptodome_filename(comps, filename), mode) as fd:
-        return fd.read()
+def load_file(file_name, mode="rb"):
+    results = None
+
+    try:
+        if not test_vectors_available:
+            raise FileNotFoundError(errno.ENOENT,
+                                    os.strerror(errno.ENOENT),
+                                    file_name)
+
+        dir_comps = ("PublicKey", "RSA")
+        init_dir = os.path.dirname(pycryptodome_test_vectors.__file__)
+        full_file_name = os.path.join(os.path.join(init_dir, *dir_comps), file_name)
+        with open(full_file_name, mode) as file_in:
+            results = file_in.read()
+
+    except FileNotFoundError:
+        warnings.warn("Skipping tests for RSA based on %s" % file_name,
+                      UserWarning,
+                      stacklevel=2)
+
+    if results is None:
+        raise SkipTest("Missing %s" % file_name)
+
+    return results
 
 
 def der2pem(der, text='PUBLIC'):
     import binascii
-    chunks = [ binascii.b2a_base64(der[i:i+48]) for i in range(0, len(der), 48) ]
-    pem  = b('-----BEGIN %s KEY-----\n' % text)
+    chunks = [binascii.b2a_base64(der[i:i+48]) for i in range(0, len(der), 48)]
+    pem = b('-----BEGIN %s KEY-----\n' % text)
     pem += b('').join(chunks)
     pem += b('-----END %s KEY-----' % text)
     return pem
+
 
 class ImportKeyTests(unittest.TestCase):
     # 512-bit RSA key generated with openssl
@@ -71,7 +101,7 @@ BX85JB8zqwHB
 -----END PRIVATE KEY-----'''
 
     # The same RSA private key as in rsaKeyPEM, but now encrypted
-    rsaKeyEncryptedPEM=(
+    rsaKeyEncryptedPEM = (
 
         # PEM encryption
         # With DES and passphrase 'test'
@@ -163,7 +193,7 @@ Lr7UkvEtFrRhDDKMtuIIq19FrL4pUIMymPMSLBn3hJLe30Dw48GQM4UCAwEAAQ==
     def testImportKey1(self):
         """Verify import of RSAPrivateKey DER SEQUENCE"""
         key = RSA.importKey(self.rsaKeyDER)
-        self.failUnless(key.has_private())
+        self.assertTrue(key.has_private())
         self.assertEqual(key.n, self.n)
         self.assertEqual(key.e, self.e)
         self.assertEqual(key.d, self.d)
@@ -173,7 +203,7 @@ Lr7UkvEtFrRhDDKMtuIIq19FrL4pUIMymPMSLBn3hJLe30Dw48GQM4UCAwEAAQ==
     def testImportKey2(self):
         """Verify import of SubjectPublicKeyInfo DER SEQUENCE"""
         key = RSA.importKey(self.rsaPublicKeyDER)
-        self.failIf(key.has_private())
+        self.assertFalse(key.has_private())
         self.assertEqual(key.n, self.n)
         self.assertEqual(key.e, self.e)
 
@@ -200,14 +230,14 @@ Lr7UkvEtFrRhDDKMtuIIq19FrL4pUIMymPMSLBn3hJLe30Dw48GQM4UCAwEAAQ==
     def testImportKey4unicode(self):
         """Verify import of RSAPrivateKey DER SEQUENCE, encoded with PEM as unicode"""
         key = RSA.importKey(self.rsaPublicKeyPEM)
-        self.assertEqual(key.has_private(),False) # failIf
+        self.assertEqual(key.has_private(),False) # assertFalse
         self.assertEqual(key.n, self.n)
         self.assertEqual(key.e, self.e)
 
     def testImportKey4bytes(self):
         """Verify import of SubjectPublicKeyInfo DER SEQUENCE, encoded with PEM as byte string"""
         key = RSA.importKey(b(self.rsaPublicKeyPEM))
-        self.assertEqual(key.has_private(),False) # failIf
+        self.assertEqual(key.has_private(),False) # assertFalse
         self.assertEqual(key.n, self.n)
         self.assertEqual(key.e, self.e)
 
@@ -233,7 +263,7 @@ Lr7UkvEtFrRhDDKMtuIIq19FrL4pUIMymPMSLBn3hJLe30Dw48GQM4UCAwEAAQ==
         """Verify import of encrypted PrivateKeyInfo DER SEQUENCE"""
         for t in self.rsaKeyEncryptedPEM:
             key = RSA.importKey(t[1], t[0])
-            self.failUnless(key.has_private())
+            self.assertTrue(key.has_private())
             self.assertEqual(key.n, self.n)
             self.assertEqual(key.e, self.e)
             self.assertEqual(key.d, self.d)
@@ -243,7 +273,7 @@ Lr7UkvEtFrRhDDKMtuIIq19FrL4pUIMymPMSLBn3hJLe30Dw48GQM4UCAwEAAQ==
     def testImportKey9(self):
         """Verify import of unencrypted PrivateKeyInfo DER SEQUENCE"""
         key = RSA.importKey(self.rsaKeyDER8)
-        self.failUnless(key.has_private())
+        self.assertTrue(key.has_private())
         self.assertEqual(key.n, self.n)
         self.assertEqual(key.e, self.e)
         self.assertEqual(key.d, self.d)
@@ -253,7 +283,7 @@ Lr7UkvEtFrRhDDKMtuIIq19FrL4pUIMymPMSLBn3hJLe30Dw48GQM4UCAwEAAQ==
     def testImportKey10(self):
         """Verify import of unencrypted PrivateKeyInfo DER SEQUENCE, encoded with PEM"""
         key = RSA.importKey(self.rsaKeyPEM8)
-        self.failUnless(key.has_private())
+        self.assertTrue(key.has_private())
         self.assertEqual(key.n, self.n)
         self.assertEqual(key.e, self.e)
         self.assertEqual(key.d, self.d)
@@ -334,8 +364,8 @@ Lr7UkvEtFrRhDDKMtuIIq19FrL4pUIMymPMSLBn3hJLe30Dw48GQM4UCAwEAAQ==
         # PEM envelope, PKCS#1, old PEM encryption
         key = RSA.construct([self.n, self.e, self.d, self.p, self.q, self.pInv])
         outkey = key.export_key('PEM', 'test')
-        self.failUnless(tostr(outkey).find('4,ENCRYPTED')!=-1)
-        self.failUnless(tostr(outkey).find('BEGIN RSA PRIVATE KEY')!=-1)
+        self.assertTrue(tostr(outkey).find('4,ENCRYPTED')!=-1)
+        self.assertTrue(tostr(outkey).find('BEGIN RSA PRIVATE KEY')!=-1)
         inkey = RSA.importKey(outkey, 'test')
         self.assertEqual(key.n, inkey.n)
         self.assertEqual(key.e, inkey.e)
@@ -346,8 +376,8 @@ Lr7UkvEtFrRhDDKMtuIIq19FrL4pUIMymPMSLBn3hJLe30Dw48GQM4UCAwEAAQ==
         # PEM envelope, PKCS#1, old PEM encryption
         key = RSA.construct([self.n, self.e, self.d, self.p, self.q, self.pInv])
         outkey = key.export_key('PEM', 'test', pkcs=1)
-        self.failUnless(tostr(outkey).find('4,ENCRYPTED')!=-1)
-        self.failUnless(tostr(outkey).find('BEGIN RSA PRIVATE KEY')!=-1)
+        self.assertTrue(tostr(outkey).find('4,ENCRYPTED')!=-1)
+        self.assertTrue(tostr(outkey).find('BEGIN RSA PRIVATE KEY')!=-1)
         inkey = RSA.importKey(outkey, 'test')
         self.assertEqual(key.n, inkey.n)
         self.assertEqual(key.e, inkey.e)
@@ -358,8 +388,8 @@ Lr7UkvEtFrRhDDKMtuIIq19FrL4pUIMymPMSLBn3hJLe30Dw48GQM4UCAwEAAQ==
         # PEM envelope, PKCS#8, old PEM encryption
         key = RSA.construct([self.n, self.e, self.d, self.p, self.q, self.pInv])
         outkey = key.export_key('PEM', 'test', pkcs=8)
-        self.failUnless(tostr(outkey).find('4,ENCRYPTED')!=-1)
-        self.failUnless(tostr(outkey).find('BEGIN PRIVATE KEY')!=-1)
+        self.assertTrue(tostr(outkey).find('4,ENCRYPTED')!=-1)
+        self.assertTrue(tostr(outkey).find('BEGIN PRIVATE KEY')!=-1)
         inkey = RSA.importKey(outkey, 'test')
         self.assertEqual(key.n, inkey.n)
         self.assertEqual(key.e, inkey.e)
@@ -371,8 +401,8 @@ Lr7UkvEtFrRhDDKMtuIIq19FrL4pUIMymPMSLBn3hJLe30Dw48GQM4UCAwEAAQ==
         key = RSA.construct([self.n, self.e, self.d, self.p, self.q, self.pInv])
         outkey = key.export_key('PEM', 'test', pkcs=8,
                 protection='PBKDF2WithHMAC-SHA1AndDES-EDE3-CBC')
-        self.failUnless(tostr(outkey).find('4,ENCRYPTED')==-1)
-        self.failUnless(tostr(outkey).find('BEGIN ENCRYPTED PRIVATE KEY')!=-1)
+        self.assertTrue(tostr(outkey).find('4,ENCRYPTED')==-1)
+        self.assertTrue(tostr(outkey).find('BEGIN ENCRYPTED PRIVATE KEY')!=-1)
         inkey = RSA.importKey(outkey, 'test')
         self.assertEqual(key.n, inkey.n)
         self.assertEqual(key.e, inkey.e)
@@ -394,12 +424,42 @@ Lr7UkvEtFrRhDDKMtuIIq19FrL4pUIMymPMSLBn3hJLe30Dw48GQM4UCAwEAAQ==
         key = RSA.construct([self.n, self.e, self.d, self.p, self.q, self.pInv])
         self.assertRaises(ValueError, key.export_key, 'DER', 'test', 1)
 
+    def testExportKey16(self):
+        # Export and re-import the encrypted key. It must match.
+        # PEM envelope, PKCS#8, PKCS#8 encryption with parameters
+        key = RSA.construct([self.n, self.e, self.d, self.p, self.q, self.pInv])
+        outkey = key.export_key('PEM', 'test', pkcs=8,
+                                protection='PBKDF2WithHMAC-SHA512AndAES256-CBC',
+                                prot_params={'iteration_count':123}
+                                )
+        self.assertTrue(tostr(outkey).find('4,ENCRYPTED')==-1)
+        self.assertTrue(tostr(outkey).find('BEGIN ENCRYPTED PRIVATE KEY')!=-1)
+
+        # Verify the iteration count
+        der = PEM.decode(tostr(outkey))[0]
+        seq1 = asn1.DerSequence().decode(der)
+        seq2 = asn1.DerSequence().decode(seq1[0])
+        seq3 = asn1.DerSequence().decode(seq2[1])
+        seq4 = asn1.DerSequence().decode(seq3[0])
+        seq5 = asn1.DerSequence().decode(seq4[1])
+        self.assertEqual(seq5[1], 123)
+
+        inkey = RSA.importKey(outkey, 'test')
+        self.assertEqual(key.n, inkey.n)
+        self.assertEqual(key.e, inkey.e)
+        self.assertEqual(key.d, inkey.d)
+
     def test_import_key(self):
         """Verify that import_key is an alias to importKey"""
         key = RSA.import_key(self.rsaPublicKeyDER)
-        self.failIf(key.has_private())
+        self.assertFalse(key.has_private())
         self.assertEqual(key.n, self.n)
         self.assertEqual(key.e, self.e)
+
+    def test_import_key_ba_mv(self):
+        """Verify that import_key can be used on bytearrays and memoryviews"""
+        key = RSA.import_key(bytearray(self.rsaPublicKeyDER))
+        key = RSA.import_key(memoryview(self.rsaPublicKeyDER))
 
     def test_exportKey(self):
         key = RSA.construct([self.n, self.e, self.d, self.p, self.q, self.pInv])
@@ -446,7 +506,7 @@ a3:18:d0:da:95:9f:05:d6:99:37:db:e0:81:b3:c8:
         key = RSA.importKey(x509_v1_cert)
         self.assertEqual(key.e, exponent)
         self.assertEqual(key.n, modulus)
-        self.failIf(key.has_private())
+        self.assertFalse(key.has_private())
 
     def test_x509v3(self):
 
@@ -498,22 +558,39 @@ d6:fa:d8:36:42:d4:97:29:17
         key = RSA.importKey(x509_v3_cert)
         self.assertEqual(key.e, exponent)
         self.assertEqual(key.n, modulus)
-        self.failIf(key.has_private())
+        self.assertFalse(key.has_private())
 
 
 class TestImport_2048(unittest.TestCase):
+
+    def test_import_pss(self):
+        pub_key_file = load_file("rsa2048_pss_public.pem")
+        pub_key = RSA.import_key(pub_key_file)
+
+        priv_key_file = load_file("rsa2048_pss_private.pem")
+        priv_key = RSA.import_key(priv_key_file)
+
+        self.assertEqual(pub_key.n, priv_key.n)
 
     def test_import_openssh_public(self):
         key_file_ref = load_file("rsa2048_private.pem")
         key_file = load_file("rsa2048_public_openssh.txt")
 
-        key_ref = RSA.import_key(key_file_ref).publickey()
+        # Skip test if test vectors are not installed
+        if None in (key_file_ref, key_file):
+            return
+
+        key_ref = RSA.import_key(key_file_ref).public_key()
         key = RSA.import_key(key_file)
         self.assertEqual(key_ref, key)
 
     def test_import_openssh_private_clear(self):
         key_file = load_file("rsa2048_private_openssh.pem")
         key_file_old = load_file("rsa2048_private_openssh_old.pem")
+
+        # Skip test if test vectors are not installed
+        if None in (key_file_old, key_file):
+            return
 
         key = RSA.import_key(key_file)
         key_old = RSA.import_key(key_file_old)
@@ -524,13 +601,25 @@ class TestImport_2048(unittest.TestCase):
         key_file = load_file("rsa2048_private_openssh_pwd.pem")
         key_file_old = load_file("rsa2048_private_openssh_pwd_old.pem")
 
+        # Skip test if test vectors are not installed
+        if None in (key_file_old, key_file):
+            return
+
         key = RSA.import_key(key_file, b"password")
         key_old = RSA.import_key(key_file_old)
         self.assertEqual(key, key_old)
 
+    def test_import_pkcs8_private(self):
+        key_file_ref = load_file("rsa2048_private.pem")
+        key_file = load_file("rsa2048_private_p8.der")
 
-if __name__ == '__main__':
-    unittest.main()
+        # Skip test if test vectors are not installed
+        if None in (key_file_ref, key_file):
+            return
+
+        key_ref = RSA.import_key(key_file_ref)
+        key = RSA.import_key(key_file, b'secret')
+        self.assertEqual(key_ref, key)
 
 
 def get_tests(config={}):
@@ -542,7 +631,6 @@ def get_tests(config={}):
 
 
 if __name__ == '__main__':
-    suite = lambda: unittest.TestSuite(get_tests())
+    def suite():
+        return unittest.TestSuite(get_tests())
     unittest.main(defaultTest='suite')
-
-# vim:set ts=4 sw=4 sts=4 expandtab:

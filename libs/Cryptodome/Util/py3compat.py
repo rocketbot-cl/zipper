@@ -78,6 +78,8 @@ if sys.version_info[0] == 2:
             return s
         elif isinstance(s, bytearray):
             return bytes(s)
+        elif isinstance(s, memoryview):
+            return s.tobytes()
         else:
             return ''.join(s)
     def tostr(bs):
@@ -85,17 +87,19 @@ if sys.version_info[0] == 2:
     def byte_string(s):
         return isinstance(s, str)
 
-    # In Pyton 2.x, StringIO is a stand-alone module
-    from StringIO import StringIO as BytesIO
+    # In Python 2, a memoryview does not support concatenation
+    def concat_buffers(a, b):
+        if isinstance(a, memoryview):
+            a = a.tobytes()
+        if isinstance(b, memoryview):
+            b = b.tobytes()
+        return a + b
+
+    from StringIO import StringIO
+    BytesIO = StringIO
 
     from sys import maxint
 
-    if sys.version_info[1] < 7:
-        import types
-        _memoryview = types.NoneType
-    else:
-        _memoryview = memoryview
-    
     iter_range = xrange
 
     def is_native_int(x):
@@ -104,7 +108,14 @@ if sys.version_info[0] == 2:
     def is_string(x):
         return isinstance(x, basestring)
 
+    def is_bytes(x):
+        return isinstance(x, str) or \
+                isinstance(x, bytearray) or \
+                isinstance(x, memoryview)
+
     ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
+
+    FileNotFoundError = IOError
 
 else:
     def b(s):
@@ -125,6 +136,8 @@ else:
             return bytes(s)
         elif isinstance(s,str):
             return s.encode(encoding)
+        elif isinstance(s, memoryview):
+            return s.tobytes()
         else:
             return bytes([s])
     def tostr(bs):
@@ -132,11 +145,12 @@ else:
     def byte_string(s):
         return isinstance(s, bytes)
 
-    # In Python 3.x, StringIO is a sub-module of io
-    from io import BytesIO
-    from sys import maxsize as maxint
+    def concat_buffers(a, b):
+        return a + b
 
-    _memoryview = memoryview
+    from io import BytesIO
+    from io import StringIO
+    from sys import maxsize as maxint
 
     iter_range = range
 
@@ -146,14 +160,21 @@ else:
     def is_string(x):
         return isinstance(x, str)
 
+    def is_bytes(x):
+        return isinstance(x, bytes) or \
+                isinstance(x, bytearray) or \
+                isinstance(x, memoryview)
+
     from abc import ABC
+
+    FileNotFoundError = FileNotFoundError
 
 
 def _copy_bytes(start, end, seq):
     """Return an immutable copy of a sequence (byte string, byte array, memoryview)
     in a certain interval [start:seq]"""
 
-    if isinstance(seq, _memoryview):
+    if isinstance(seq, memoryview):
         return seq[start:end].tobytes()
     elif isinstance(seq, bytearray):
         return bytes(seq[start:end])

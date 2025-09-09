@@ -1,4 +1,4 @@
-# -*- coding: ascii -*-
+# -*- coding: utf-8 -*-
 #
 #  Util/Counter.py : Fast counter for use with CTR-mode ciphers
 #
@@ -45,11 +45,14 @@ def new(nbits, prefix=b"", suffix=b"", initial_value=1, little_endian=False, all
         used.
       initial_value (integer):
         The initial value of the counter. Default value is 1.
+        Its length in bits must not exceed the argument ``nbits``.
       little_endian (boolean):
         If ``True``, the counter number will be encoded in little endian format.
         If ``False`` (default), in big endian format.
       allow_wraparound (boolean):
         This parameter is ignored.
+        An ``OverflowError`` exception is always raised when the counter wraps
+        around to zero.
     Returns:
       An object that can be passed with the :data:`counter` parameter to a CTR mode
       cipher.
@@ -60,6 +63,12 @@ def new(nbits, prefix=b"", suffix=b"", initial_value=1, little_endian=False, all
 
     if (nbits % 8) != 0:
         raise ValueError("'nbits' must be a multiple of 8")
+
+    iv_bl = initial_value.bit_length()
+    if iv_bl > nbits:
+        raise ValueError("Initial value takes %d bits but it is longer than "
+                         "the counter (%d bits)" %
+                         (iv_bl, nbits))
 
     # Ignore wraparound
     return {"counter_len": nbits // 8,
