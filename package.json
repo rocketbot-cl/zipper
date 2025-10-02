@@ -1,6 +1,11 @@
 {
   "author": "Danilo Toro - Rocketbot - <danilo.toro@rocketbot.cl>, David Cuello <david@rocketbot.cl>",
-  "description": "Módulo para comprimir y descomprimir archivos encriptados.",
+  "description": "Module to compress and decompress encrypted files .zip.",
+  "description_lang": {
+    "es": "Módulo para comprimir y descomprimir archivos encriptados .zip.",
+    "en": "Module to compress and decompress .zip encrypted files .",
+    "pr": "Módulo para compactar e descompactar arquivos .zip criptografados."
+  },
   "disclaimer": "THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM “AS IS” WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.",
   "version": "2.1",
   "license": "MIT",
@@ -15,7 +20,8 @@
   },
   "title": {
     "en": "Zipper",
-    "es": "Zipper"
+    "es": "Zipper",
+    "pr": "Zipper"
   },
   "icon": "data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBpZD0iX3gzMV8iIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDI0IDI0IiBoZWlnaHQ9IjUxMnB4IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSI1MTJweCI+PHBhdGggZD0ibTEyLjUgMjFjLS4yNzYgMC0uNS0uMjI0LS41LS41di01YzAtLjI3Ni4yMjQtLjUuNS0uNWgxLjVjMS4xMDMgMCAyIC44OTcgMiAycy0uODk3IDItMiAyaC0xdjEuNWMwIC4yNzYtLjIyNC41LS41LjV6bS41LTNoMWMuNTUyIDAgMS0uNDQ4IDEtMXMtLjQ0OC0xLTEtMWgtMXoiIGZpbGw9IiMwMDAwMDAiLz48cGF0aCBkPSJtOS41IDIxYy0uMjc2IDAtLjUtLjIyNC0uNS0uNXYtNWMwLS4yNzYuMjI0LS41LjUtLjVzLjUuMjI0LjUuNXY1YzAgLjI3Ni0uMjI0LjUtLjUuNXoiIGZpbGw9IiMwMDAwMDAiLz48cGF0aCBkPSJtNi41IDIxaC0zYy0uMTggMC0uMzQ3LS4wOTctLjQzNi0uMjU0LS4wODgtLjE1Ni0uMDg2LS4zNDkuMDA3LS41MDNsMi41NDYtNC4yNDNoLTIuMTE3Yy0uMjc2IDAtLjUtLjIyNC0uNS0uNXMuMjI0LS41LjUtLjVoM2MuMTggMCAuMzQ3LjA5Ny40MzYuMjU0LjA4OC4xNTYuMDg2LjM0OS0uMDA3LjUwM2wtMi41NDYgNC4yNDNoMi4xMTdjLjI3NiAwIC41LjIyNC41LjVzLS4yMjQuNS0uNS41eiIgZmlsbD0iIzAwMDAwMCIvPjxwYXRoIGQ9Im0xNy41IDI0aC0xNWMtMS4zNzkgMC0yLjUtMS4xMjEtMi41LTIuNXYtMTljMC0xLjM3OSAxLjEyMS0yLjUgMi41LTIuNWgxMmMuMjc2IDAgLjUuMjI0LjUuNXMtLjIyNC41LS41LjVoLTEyYy0uODI3IDAtMS41LjY3My0xLjUgMS41djE5YzAgLjgyNy42NzMgMS41IDEuNSAxLjVoMTVjLjgyNyAwIDEuNS0uNjczIDEuNS0xLjV2LThjMC0uMjc2LjIyNC0uNS41LS41cy41LjIyNC41LjV2OGMwIDEuMzc5LTEuMTIxIDIuNS0yLjUgMi41eiIgZmlsbD0iIzAwMDAwMCIvPjxwYXRoIGQ9Im0yMi41IDExaC02Yy0uODI3IDAtMS41LS42NzMtMS41LTEuNXYtNGMwLS44MjcuNjczLTEuNSAxLjUtMS41aDZjLjgyNyAwIDEuNS42NzMgMS41IDEuNXY0YzAgLjgyNy0uNjczIDEuNS0xLjUgMS41em0tNi02Yy0uMjc1IDAtLjUuMjI1LS41LjV2NGMwIC4yNzUuMjI1LjUuNS41aDZjLjI3NSAwIC41LS4yMjUuNS0uNXYtNGMwLS4yNzUtLjIyNS0uNS0uNS0uNXoiIGZpbGw9IiMwMDAwMDAiLz48cGF0aCBkPSJtMjEuNSA1aC00Yy0uMjc2IDAtLjUtLjIyNC0uNS0uNXYtMmMwLTEuMzc5IDEuMTIxLTIuNSAyLjUtMi41czIuNSAxLjEyMSAyLjUgMi41djJjMCAuMjc2LS4yMjQuNS0uNS41em0tMy41LTFoM3YtMS41YzAtLjgyNy0uNjczLTEuNS0xLjUtMS41cy0xLjUuNjczLTEuNSAxLjV6IiBmaWxsPSIjMDAwMDAwIi8+PC9zdmc+Cg==",
   "children": [
@@ -159,6 +165,28 @@
             },
             "id": "zip",
             "css": "col-md-12"
+          },
+          {
+            "type": "input",
+            "description": {
+              "es": "Variable donde se almacenara True o False dependiendo del éxito de la ejecución.",
+              "en": "Variable where True or False will be stored depending on the success of the execution.",
+              "pr": "Variável onde True ou False será armazenado dependendo do sucesso da execução."
+            },
+            "placeholder": "Variable",
+            "title": {
+              "es": "Asignar resultado a Variable:",
+              "en": "Assign result to a Variable:",
+              "pr": "Atribuir resultado à variável:"
+            },
+            "help": {
+              "es": "Nombre de variable sin {}",
+              "en": "Variable name without {}",
+              "pr": "Nome da variabel em chaves {}"
+            },
+            "remove_vars": true,
+            "id": "var_",
+            "css": "col-md-12"
           }
         ]
       },
@@ -244,6 +272,28 @@
               "en": "By default, It will save on folder of file"
             },
             "id": "file",
+            "css": "col-md-12"
+          },
+          {
+            "type": "input",
+            "description": {
+              "es": "Variable donde se almacenara True o False dependiendo del éxito de la ejecución.",
+              "en": "Variable where True or False will be stored depending on the success of the execution.",
+              "pr": "Variável onde True ou False será armazenado dependendo do sucesso da execução."
+            },
+            "placeholder": "Variable",
+            "title": {
+              "es": "Asignar resultado a Variable:",
+              "en": "Assign result to a Variable:",
+              "pr": "Atribuir resultado à variável:"
+            },
+            "help": {
+              "es": "Nombre de variable sin {}",
+              "en": "Variable name without {}",
+              "pr": "Nome da variabel em chaves {}"
+            },
+            "remove_vars": true,
+            "id": "var_",
             "css": "col-md-12"
           }
         ]

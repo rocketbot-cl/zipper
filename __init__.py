@@ -45,6 +45,7 @@ if module == "encryptZip":
     secret = GetParams("pass")
     method = GetParams("method")
     bits = GetParams("bits")
+    var_ = GetParams("var_")
 
     compression = {
         "LZMA": pyzipper.ZIP_LZMA,
@@ -116,8 +117,9 @@ if module == "encryptZip":
                 zf.setpassword(secret)
                 zf.setencryption(pyzipper.WZ_AES, nbits=bits)
                 zf.write(file_, basename(file_))
-
+        SetVar(var_, True)
     except Exception as e:
+        SetVar(var_, False)
         PrintException()
         raise e
 
@@ -125,6 +127,7 @@ if module == "desencryptZip":
     file_ = GetParams("file")
     zip_path = GetParams("zip")
     secret = GetParams("pass")
+    var_ = GetParams("var_")
 
     try:
         if secret:
@@ -136,6 +139,8 @@ if module == "desencryptZip":
         
         with pyzipper.AESZipFile(zip_path) as zf:
             zf.extractall(path=file_, pwd=secret)
+        SetVar(var_, True)
     except Exception as e:
         PrintException()
+        SetVar(var_, False)
         raise e
